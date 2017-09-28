@@ -2,6 +2,7 @@ listOfMakanan = [:]
 listOfMakananYangSudahJadi = [:]
 listOfBahanMakanan = [:]
 listOfCurrentPesanan = [:]
+listOfCurrentPesananTemporary = [:]
 countMeja = 0
 confirmed = false
 masuk = false
@@ -88,6 +89,14 @@ def tambahPesanan(namaMakanan, jumlah) {
     }
 }
 
+def tambahPesananTemporary(namaMakanan, jumlah) {
+    if (listOfCurrentPesananTemporary.get(namaMakanan) == null) {
+        listOfCurrentPesananTemporary[namaMakanan] = new Tuple(namaMakanan, jumlah)
+    } else {
+        listOfCurrentPesananTemporary[namaMakanan] = new Tuple(namaMakanan, jumlah + listOfCurrentPesanan.get(namaMakanan)[1])
+    }
+}
+
 def pesanMakanan(namaMakanan, jumlah) {
     if (masuk) {
         existMakanan = listOfMakanan.get(namaMakanan)
@@ -98,10 +107,11 @@ def pesanMakanan(namaMakanan, jumlah) {
             selisihJumlah = existMakanan[1] - jumlah
             if (selisihJumlah < 0) {
                 if (bahanCukup(namaMakanan, -selisihJumlah)) {
-                    for (bahan in listOfMakanan[namaMakanan].komposisiMakanan) {
-                        operasiBahanMakanan(kurang, bahan[0], bahan[1]*-selisihJumlah, bahan[2])
-                    }
-                    tambahPesanan(namaMakanan, jumlah)
+                    // for (bahan in listOfMakanan[namaMakanan].komposisiMakanan) {
+                    //     operasiBahanMakanan(kurang, bahan[0], bahan[1]*-selisihJumlah, bahan[2])
+                    // }
+
+                    tambahPesananTemporary(namaMakanan, jumlah)
                 } else {
                     println "Bahan makanan tidak cukup untuk membuat pesanan"
                 }
@@ -123,14 +133,22 @@ def batalPesan(namaMakanan, jumlah) {
             if (existPesanan == null) {
                 println "Makanan tidak terdapat dalam pesanan"
             } else {
-                selisihJumlah = existPesanan[1] - jumlah
+                existPesananTemp = listOfCurrentPesananTemporary.get(namaMakanan)
+                selisihJumlah = existPesananTemp[1] - jumlah
                 if (selisihJumlah <= 0) {
-                    listOfCurrentPesanan.remove(namaMakanan)
-                    listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+existPesanan[1])
-                } else {
-                    listOfCurrentPesanan[namaMakanan] = new Tuple(existPesanan[0], selisihJumlah)
-                    listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+jumlah)
-                }   
+                    listOfCurrentPesananTemporary.remove(namaMakanan)
+                    selisihJumlah = listOfCurrentPesanan.get(namaMakanan)[1] + selisihJumlah
+                    if (selisihJumlah <= 0) {
+                        listOfCurrentPesanan.remove(namaMakanan)
+                        listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+existPesanan[1])
+                    } else {
+                        listOfCurrentPesanan[namaMakanan] = new Tuple(existPesanan[0], selisihJumlah)
+                        listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+jumlah)
+                    }
+                }
+                else {
+                    listOfCurrentPesananTemporary[namaMakanan] = new Tuple(namaMakanan, selisihJumlah)
+                }
             }
         } else {
             println "Anda sudah melakukan konfirmasi pesanan tidak dapat membatalkan lagi"
@@ -166,6 +184,12 @@ def pelangganKeluar() {
 
 def konfirmasiPesanan() {
     confirmed = true
+    for (makanan in listOfCurrentPesananTemporary) {
+        for (bahan in listOfMakanan[makanan.key].komposisiMakanan) {
+            operasiBahanMakanan(kurang, bahan[0], bahan[1]*makanan.value[1], bahan[2])
+        }
+    }
+    listOfCurrentPesananTemporary = [:]
     listOfCurrentPesanan = [:]
 }
 
@@ -237,10 +261,31 @@ operasiBahanMakanan(tambah, "tepung", 10, "gram")
 operasiBahanMakanan(tambah, "ayam", 3, "ekor")
 
 //pelangganMasuk('dine-in')
+
 pelanggan masuk untuk "dine-in"
 tolong tambahkan pesanan "Pizza" sebanyak "5" 
 tolong tambahkan pesanan "Pizza" sebanyak "5"
-tolong kurangi pesanan "Pizza" sebanyak "2"
+println listOfMakanan
+println listOfMakananYangSudahJadi
+println listOfBahanMakanan
+println listOfCurrentPesanan
+println listOfCurrentPesananTemporary
+println()
+tolong tambahkan pesanan "Pizza" sebanyak "3"
+println listOfMakanan
+println listOfMakananYangSudahJadi
+println listOfBahanMakanan
+println listOfCurrentPesanan
+println listOfCurrentPesananTemporary
+println()
+
+tolong kurangi pesanan "Pizza" sebanyak "52"
+println listOfMakanan
+println listOfMakananYangSudahJadi
+println listOfBahanMakanan
+println listOfCurrentPesanan
+println listOfCurrentPesananTemporary
+println()
 pelanggan konfirmasi
 pelanggan keluar
 //konfirmasiPesanan()
@@ -250,3 +295,4 @@ println listOfMakanan
 println listOfMakananYangSudahJadi
 println listOfBahanMakanan
 println listOfCurrentPesanan
+println listOfCurrentPesananTemporary
