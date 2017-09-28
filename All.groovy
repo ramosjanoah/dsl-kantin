@@ -169,6 +169,46 @@ def konfirmasiPesanan() {
     listOfCurrentPesanan = [:]
 }
 
+
+//---------------------------GRAMMAR--------------------
+int kasir_kas = 0
+tambahkan = {m,j ->  pesanMakanan(m,j)}
+kurangi = {m,j ->  batalPesan(m,j)}
+bayar_pesanan = {uang -> kasir_kas = kasir_kas+uang}
+masuk = {mode -> pelangganMasuk(mode)}
+keluar = { pelangganKeluar() }
+konfirmasi = { konfirmasiPesanan() }
+
+/*Operasi pelanggan untuk bayar pesanan. Asumsi: pelanggan pasti memberikan uang pas
+    contoh: mau bayar_pesanan sebesar "800"
+*/
+def mau(action) {
+    bayar_pesanan: [sebesar: {u -> action(u.toInteger())}]
+}
+
+/*Operasi pelanggan untuk menambah/mengurangi pesanan
+    Contoh menambah pesanan: tolong tambahkan pesanan "Pizza" sebanyak "5" 
+    Contoh mengurangi pesanan: tolong kurangi pesanan "Pizza" sebanyak "2" 
+*/
+def tolong(action) {
+    tambahkan:  [pesanan: { m -> [sebanyak: { j -> action(m,j.toInteger()) }] }] 
+    kurangi: [pesanan: { m -> [sebanyak: { j -> action(m,j.toInteger()) }] }]
+}
+
+/*Operasi untuk pelanggan:
+    Bila pelanggan keluar kantin: pelanggan keluar
+    Bila pelanggan masuk:   pelanggan masuk untuk "dine-in"
+                            pelanggan masuk untuk "takeaway"
+    Bila pelanggan konformasi pesanan: pelanggan konfirmasi pesanan
+*/
+def pelanggan(action) {
+    if (action==keluar) pelangganKeluar()
+    else if (action==konfirmasi) konfirmasiPesanan()
+    else{
+        masuk: [ untuk : { mode -> action(mode) }]
+    }
+}
+
 makanan = Makanan.make {
     nama "Pizza"
     harga 100000
@@ -196,12 +236,16 @@ operasiBahanMakanan(tambah, "cabe", 5, "gram")
 operasiBahanMakanan(tambah, "tepung", 10, "gram")
 operasiBahanMakanan(tambah, "ayam", 3, "ekor")
 
-pelangganMasuk("dine-in")
-pesanMakanan("Pizza", 10)
-pesanMakanan("Pizza", 5)
-batalPesan("Pizza", 2)
-konfirmasiPesanan()
-pelangganKeluar()
+//pelangganMasuk('dine-in')
+pelanggan masuk untuk "dine-in"
+tolong tambahkan pesanan "Pizza" sebanyak "5" 
+tolong tambahkan pesanan "Pizza" sebanyak "5"
+tolong kurangi pesanan "Pizza" sebanyak "2"
+pelanggan konfirmasi
+pelanggan keluar
+//konfirmasiPesanan()
+//pelangganKeluar()
+
 println listOfMakanan
 println listOfMakananYangSudahJadi
 println listOfBahanMakanan
