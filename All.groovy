@@ -5,6 +5,7 @@ listOfCurrentPesanan = [:]
 countMeja = 0
 confirmed = false
 masuk = false
+dine_in = false
 tambah = {
     a, b -> a + b
 }
@@ -144,20 +145,23 @@ def pelangganMasuk(mode) {
         if (countMeja == 0) {
             println "Tidak ada meja yang tersedia"
             masuk = false
+            dine_in = false
         } else {
             operasiMeja(kurang, 1)
             masuk = true
+            dine_in = true
         }
     } else {
         masuk = true
-
+        dine_in = false
     } 
 }
 
 def pelangganKeluar() {
     masuk = false
     confirmed = false
-    operasiMeja(tambah, 1)
+    if (dine_in)
+        operasiMeja(tambah, 1)
 }
 
 def konfirmasiPesanan() {
