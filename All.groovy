@@ -3,7 +3,8 @@ listOfMakananYangSudahJadi = [:]
 listOfBahanMakanan = [:]
 listOfCurrentPesanan = [:]
 countMeja = 0
-
+confirmed = false
+masuk = false
 tambah = {
     a, b -> a + b
 }
@@ -87,44 +88,81 @@ def tambahPesanan(namaMakanan, jumlah) {
 }
 
 def pesanMakanan(namaMakanan, jumlah) {
-    existMakanan = listOfMakanan.get(namaMakanan)
-    if (existMakanan == null) {
-        println "Makanan tidak terdapat dalam menu"
-    } else {
-        existMakanan = listOfMakananYangSudahJadi.get(namaMakanan)
-        selisihJumlah = existMakanan[1] - jumlah
-        if (selisihJumlah < 0) {
-            if (bahanCukup(namaMakanan, -selisihJumlah)) {
-                for (bahan in listOfMakanan[namaMakanan].komposisiMakanan) {
-                    operasiBahanMakanan(kurang, bahan[0], bahan[1]*-selisihJumlah, bahan[2])
-                }
-                tambahPesanan(namaMakanan, jumlah)
-            } else {
-                println "Bahan makanan tidak cukup untuk membuat pesanan"
-            }
+    if (masuk) {
+        existMakanan = listOfMakanan.get(namaMakanan)
+        if (existMakanan == null) {
+            println "Makanan tidak terdapat dalam menu"
         } else {
-            makananSudahJadi = listOfMakananYangSudahJadi.get(namaMakanan)
-            listOfMakananYangSudahJadi[namaMakanan] = new Tuple(makananSudahJadi[0], makananSudahJadi[1]-jumlah)
-            tambahPesanan(namaMakanan, jumlah)
+            existMakanan = listOfMakananYangSudahJadi.get(namaMakanan)
+            selisihJumlah = existMakanan[1] - jumlah
+            if (selisihJumlah < 0) {
+                if (bahanCukup(namaMakanan, -selisihJumlah)) {
+                    for (bahan in listOfMakanan[namaMakanan].komposisiMakanan) {
+                        operasiBahanMakanan(kurang, bahan[0], bahan[1]*-selisihJumlah, bahan[2])
+                    }
+                    tambahPesanan(namaMakanan, jumlah)
+                } else {
+                    println "Bahan makanan tidak cukup untuk membuat pesanan"
+                }
+            } else {
+                makananSudahJadi = listOfMakananYangSudahJadi.get(namaMakanan)
+                listOfMakananYangSudahJadi[namaMakanan] = new Tuple(makananSudahJadi[0], makananSudahJadi[1]-jumlah)
+                tambahPesanan(namaMakanan, jumlah)
+            }
         }
+    } else {
+        println "Anda sedang tidak berada di kantin"
     }
 }
 
 def batalPesan(namaMakanan, jumlah) {
-    existPesanan = listOfCurrentPesanan.get(namaMakanan)
-    if (existPesanan == null) {
-        println "Makanan tidak terdapat dalam pesanan"
-    } else {
-        selisihJumlah = existPesanan[1] - jumlah
-        if (selisihJumlah <= 0) {
-            listOfCurrentPesanan.remove(namaMakanan)
-            listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+existPesanan[1])
+    if (masuk) {
+        if (!confirmed) {
+            existPesanan = listOfCurrentPesanan.get(namaMakanan)
+            if (existPesanan == null) {
+                println "Makanan tidak terdapat dalam pesanan"
+            } else {
+                selisihJumlah = existPesanan[1] - jumlah
+                if (selisihJumlah <= 0) {
+                    listOfCurrentPesanan.remove(namaMakanan)
+                    listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+existPesanan[1])
+                } else {
+                    listOfCurrentPesanan[namaMakanan] = new Tuple(existPesanan[0], selisihJumlah)
+                    listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+jumlah)
+                }   
+            }
         } else {
-            listOfCurrentPesanan[namaMakanan] = new Tuple(existPesanan[0], selisihJumlah)
-            listOfMakananYangSudahJadi[namaMakanan] = new Tuple(existMakanan[0], listOfMakananYangSudahJadi[namaMakanan][1]+jumlah)
+            println "Anda sudah melakukan konfirmasi pesanan tidak dapat membatalkan lagi"
         }
-        
+    } else {
+        println "Anda sedang tidak berada di kantin"
     }
+}
+
+def pelangganMasuk(mode) {
+    if (mode == "dine-in") {
+        if (countMeja == 0) {
+            println "Tidak ada meja yang tersedia"
+            masuk = false
+        } else {
+            operasiMeja(kurang, 1)
+            masuk = true
+        }
+    } else {
+        masuk = true
+
+    } 
+}
+
+def pelangganKeluar() {
+    masuk = false
+    confirmed = false
+    operasiMeja(tambah, 1)
+}
+
+def konfirmasiPesanan() {
+    confirmed = true
+    listOfCurrentPesanan = [:]
 }
 
 makanan = Makanan.make {
@@ -134,6 +172,7 @@ makanan = Makanan.make {
     bahan "tepung", 10, "gram"
     bahan "ayam", 3, "ekor"
 }
+operasiMeja(tambah, 10)
 listOfMakanan[makanan.nama] = makanan
 listOfMakananYangSudahJadi[makanan.nama] = new Tuple(makanan.nama, 10)
 
@@ -153,9 +192,12 @@ operasiBahanMakanan(tambah, "cabe", 5, "gram")
 operasiBahanMakanan(tambah, "tepung", 10, "gram")
 operasiBahanMakanan(tambah, "ayam", 3, "ekor")
 
+pelangganMasuk("dine-in")
 pesanMakanan("Pizza", 10)
 pesanMakanan("Pizza", 5)
 batalPesan("Pizza", 2)
+konfirmasiPesanan()
+pelangganKeluar()
 println listOfMakanan
 println listOfMakananYangSudahJadi
 println listOfBahanMakanan
