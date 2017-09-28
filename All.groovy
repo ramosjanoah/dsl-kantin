@@ -153,7 +153,6 @@ operasiBahanMakanan(tambah, "cabe", 5, "gram")
 operasiBahanMakanan(tambah, "tepung", 10, "gram")
 operasiBahanMakanan(tambah, "ayam", 3, "ekor")
 
-<<<<<<< HEAD
 pesanMakanan("Pizza", 10)
 pesanMakanan("Pizza", 5)
 batalPesan("Pizza", 2)
@@ -161,11 +160,3 @@ println listOfMakanan
 println listOfMakananYangSudahJadi
 println listOfBahanMakanan
 println listOfCurrentPesanan
-=======
-
-
-
-
-
-
->>>>>>> 4ccf64069842fd80bcbb24b2184d374d015a7e3b
