@@ -233,6 +233,11 @@ def pelanggan(action) {
     }
 }
 
+meja = {m, j -> operasiMeja(m, j)}
+def menambah(action) {
+    meja: [sebanyak : {j -> [buah : action(tambah, j)]}]
+}
+
 makanan = Makanan.make {
     nama "Pizza"
     harga 100000
@@ -240,11 +245,11 @@ makanan = Makanan.make {
     bahan "tepung", 10, "gram"
     bahan "ayam", 3, "ekor"
 }
-operasiMeja(tambah, 10)
+menambah meja sebanyak 10 buah
 listOfMakanan[makanan.nama] = makanan
 listOfMakananYangSudahJadi[makanan.nama] = new Tuple(makanan.nama, 10)
 
-operasiBahanMakanan(tambah, "cabe", 5, "gram")
+//operasiBahanMakanan(tambah, "cabe", 5, "gram")
 operasiBahanMakanan(tambah, "tepung", 10, "gram")
 operasiBahanMakanan(tambah, "ayam", 3, "ekor")
 operasiBahanMakanan(tambah, "cabe", 5, "gram")
