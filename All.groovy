@@ -1,5 +1,14 @@
 listOfMakanan = [:]
 listOfBahanMakanan = [:]
+
+
+tambah = {
+    a, b -> a + b
+}
+kurang = {
+    a, b -> a - b
+}
+
 class Makanan {
     def nama
     def harga
@@ -32,12 +41,7 @@ class Makanan {
         }    
     }
 }
-tambah = {
-    a, b -> a + b
-}
-kurang = {
-    a, b -> a - b
-}
+
 def operasiBahanMakanan(tipe, namaBahan, jumlah, satuan) {
     existBahanMakanan = listOfBahanMakanan.get(namaBahan)
     if (existBahanMakanan == null) {
@@ -45,8 +49,8 @@ def operasiBahanMakanan(tipe, namaBahan, jumlah, satuan) {
         listOfBahanMakanan[namaBahan] = bahanMakanan
     } else {
         if (existBahanMakanan[2] == satuan) {
-            jumlahAkhir = tipe(jumlah, existBahanMakanan[1])
-            bahanMakanan = new Tuple(namaBahan, jumlah+existBahanMakanan[1], satuan)
+            jumlahAkhir = tipe(existBahanMakanan[1], jumlah)
+            bahanMakanan = new Tuple(namaBahan, jumlahAkhir, satuan)
             listOfBahanMakanan[namaBahan] = bahanMakanan
         } else {
             throw new Exception("Satuannya seharusnya " + existBahanMakanan[2])
@@ -61,11 +65,4 @@ makanan = Makanan.make {
     bahan "kucing", 2, "ekor" 
 }
 
-//tambah bahan "cabe" sebanyak 5 "gram"
-
-listOfMakanan[makanan.nama] = makanan
-bahanMakanan = new Tuple("cabe", 3, "gram")
-listOfBahanMakanan[bahanMakanan[0]] = bahanMakanan
-tambahBahanMakanan("cabe", 3, "asf")
-print listOfBahanMakanan
 
