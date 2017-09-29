@@ -175,6 +175,7 @@ def pelangganMasuk(mode) {
         masuk = true
         dine_in = false
     } 
+    println "Pelanggan Masuk"
 }
 
 def pelangganKeluar() {
@@ -182,6 +183,7 @@ def pelangganKeluar() {
     confirmed = false
     if (dine_in)
         operasiMeja(tambah, 1)
+    println "Keluar"
 }
 
 def konfirmasiPesanan() {
@@ -196,7 +198,6 @@ def konfirmasiPesanan() {
 }
 
 def pembuatanMakanan(namaMakanan, jumlah, listOfBahanMakanan) {
-    println "HAI!"
     for (bahan in listOfMakanan[namaMakanan].komposisiMakanan) {
             operasiBahanMakanan(kurang, bahan[0], bahan[1]*jumlah, bahan[2])
         }
@@ -245,7 +246,7 @@ def pelanggan(action) {
 
 meja = {m, j -> operasiMeja(m, j)}
 def menambah(action) {
-    meja: [sebanyak : {j -> [buah : action(tambah, j)]}]
+    meja: [sebanyak : {j -> [buah : action(tambah, j)]}]    
 }
 
 
@@ -289,26 +290,44 @@ makanan_pizza = Makanan.make {
     bahan "ayam", 3, "ekor"
 }
 
-listOfMakanan[makanan_pizza.nama] = makanan_pizza
-listOfMakananYangSudahJadi[makanan_pizza.nama] = new Tuple(makanan_pizza.nama, 10)
+makanan_capcay = Makanan.make {
+    nama "Capcay"
+    harga 25000
+    bahan "brokoli", 5, "kilogram"
+    bahan "air", 10, "galon"
+    bahan "micin", 3, "bungkus"
+}
 
+
+listOfMakanan[makanan_pizza.nama] = makanan_pizza
+listOfMakanan[makanan_capcay.nama] = makanan_capcay
 
 // Contoh pemakaian DSL
 
 supply 'tepung' sebanyak 100000 satuan 'gram'
 supply 'cabe' sebanyak 100000 satuan 'gram'
 supply 'ayam' sebanyak 1000 satuan 'ekor'
+supply 'brokoli' sebanyak 100000 satuan 'kilogram'
+supply 'air' sebanyak 100000 satuan 'galon'
+supply 'micin' sebanyak 1000 satuan 'bungkus'
+
 
 untuk 'koki' buatkan_makanan 'Pizza' sebanyak 50
+untuk 'koki' buatkan_makanan 'Capcay' sebanyak 50
+
+untuk 'cleaning service' bersihkan_meja 1
 untuk 'cleaning service' bersihkan_meja 2
+untuk 'cleaning service' bersihkan_meja 3
 
 menambah meja sebanyak 10 buah
 
 pelanggan masuk untuk "dine-in"
+
 tolong tambahkan pesanan "Pizza" sebanyak "2" 
-tolong tambahkan pesanan "Pizza" sebanyak "2"
+tolong tambahkan pesanan "Capcay" sebanyak "3"
 
 pelanggan konfirmasi
 pelanggan keluar
 
 check 'makanan_sudah_jadi'
+check 'bahan_makanan'
